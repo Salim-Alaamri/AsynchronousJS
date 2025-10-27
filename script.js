@@ -2,6 +2,7 @@
 
 const btn = document.querySelector('.btn-country');
 const countriesContainer = document.querySelector('.countries');
+const countryInput = document.getElementById('input');
 
 // NEW COUNTRIES API URL (use instead of the URL shown in videos):
 // https://restcountries.com/v2/name/portugal
@@ -11,19 +12,15 @@ const countriesContainer = document.querySelector('.countries');
 
 ///////////////////////////////////////
 
-const getCountryData = function(country) {
-const request = new XMLHttpRequest();
-request.open('GET', `https://restcountries.com/v3.1/name/${country}`);
-request.send();
+const getCountryAndNeighbour = function (country) {
+  //AJAX Call 1
+  const request = new XMLHttpRequest();
+  request.open('GET', `https://restcountries.com/v3.1/name/${country}`);
+  request.send();
 
-request.addEventListener('load', function () {
-  // console.log(this.responseText);
-
-  const [data] = JSON.parse(this.responseText);
-  console.log(data);
-
-  const html = `
-  <article class="country">
+  const renderCountry = function (data, className = '') {
+    const html = `
+  <article class="country ${className}">
           <img class="country__img" src="${data.flags.png}" />
           <div class="country__data">
             <h3 class="country__name">${data.altSpellings[1]}</h3>
@@ -41,10 +38,47 @@ request.addEventListener('load', function () {
         </article>
   `;
 
-  countriesContainer.insertAdjacentHTML('beforeend', html);
-  countriesContainer.style.opacity = 1;
-});
-}
+    countriesContainer.insertAdjacentHTML('beforeend', html);
+    countriesContainer.style.opacity = 1;
+  };
 
-getCountryData('oman')
-getCountryData('uae')
+  request.addEventListener('load', function () {
+    // console.log(this.responseText);
+
+    const [data] = JSON.parse(this.responseText);
+    console.log(data);
+
+    //render country 1
+    renderCountry(data);
+
+    //Get Neighbour Country (2)
+    const [neighbour] = data.borders;
+    // console.log(neighbour);
+
+    if (!neighbour) return;
+
+    //AJAX Call 2
+    const request2 = new XMLHttpRequest();
+    request2.open('GET', `https://restcountries.com/v3.1/alpha/${neighbour}`);
+    request2.send();
+
+    request2.addEventListener('load', function () {
+      const [data2] = JSON.parse(this.responseText);
+      renderCountry(data2, 'neighbour');
+      console.log(data2);
+    });
+
+    
+  });
+};
+
+// Country Input and submit
+function countryNameFromInput() {
+  const name = countryInput.value;
+  if(!name) return 
+
+    countriesContainer.innerHTML = '';
+
+ 
+  getCountryAndNeighbour(name);
+};
