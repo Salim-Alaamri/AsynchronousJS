@@ -12,14 +12,14 @@ const countryInput = document.getElementById('input');
 
 ///////////////////////////////////////
 
-const getCountryAndNeighbour = function (country) {
-  //AJAX Call 1
-  const request = new XMLHttpRequest();
-  request.open('GET', `https://restcountries.com/v3.1/name/${country}`);
-  request.send();
+// const getCountryAndNeighbour = function (country) {
+//   // AJAX Call 1
+//   const request = new XMLHttpRequest();
+//   request.open('GET', `https://restcountries.com/v3.1/name/${country}`);
+//   request.send();
 
-  const renderCountry = function (data, className = '') {
-    const html = `
+const renderCountry = function (data, className = '') {
+  const html = `
   <article class="country ${className}">
           <img class="country__img" src="${data.flags.png}" />
           <div class="country__data">
@@ -38,47 +38,79 @@ const getCountryAndNeighbour = function (country) {
         </article>
   `;
 
-    countriesContainer.insertAdjacentHTML('beforeend', html);
-    countriesContainer.style.opacity = 1;
-  };
-
-  request.addEventListener('load', function () {
-    // console.log(this.responseText);
-
-    const [data] = JSON.parse(this.responseText);
-    console.log(data);
-
-    //render country 1
-    renderCountry(data);
-
-    //Get Neighbour Country (2)
-    const [neighbour] = data.borders;
-    // console.log(neighbour);
-
-    if (!neighbour) return;
-
-    //AJAX Call 2
-    const request2 = new XMLHttpRequest();
-    request2.open('GET', `https://restcountries.com/v3.1/alpha/${neighbour}`);
-    request2.send();
-
-    request2.addEventListener('load', function () {
-      const [data2] = JSON.parse(this.responseText);
-      renderCountry(data2, 'neighbour');
-      console.log(data2);
-    });
-
-    
-  });
+  countriesContainer.insertAdjacentHTML('beforeend', html);
+  countriesContainer.style.opacity = 1;
 };
+
+//   request.addEventListener('load', function () {
+//     // console.log(this.responseText);
+
+//     const [data] = JSON.parse(this.responseText);
+//     console.log(data);
+
+//     //render country 1
+//     renderCountry(data);
+
+//     //Get Neighbour Country (2)
+// const [neighbour] = data.borders;
+//     // console.log(neighbour);
+
+// if (!neighbour) return;
+
+//     //AJAX Call 2
+//     const request2 = new XMLHttpRequest();
+//     request2.open('GET', `https://restcountries.com/v3.1/alpha/${neighbour}`);
+//     request2.send();
+
+//     request2.addEventListener('load', function () {
+//       const [data2] = JSON.parse(this.responseText);
+//       renderCountry(data2, 'neighbour');
+//       console.log(data2);
+//     });
+
+//   });
+// };
+
+// Country Input and submit
+// function countryNameFromInput() {
+//   const name = countryInput.value;
+//   if(!name) return
+
+//     countriesContainer.innerHTML = '';
+
+//   getCountryAndNeighbour(name);
+// };
+
+//Fetch API
+
+// const request = fetch(`https://restcountries.com/v3.1/name/oman`);
+
+// Get Country data
+const getCountryData = country => {
+  fetch(`https://restcountries.com/v3.1/name/${country}`)
+    .then(response => response.json())
+    .then(data => {
+      renderCountry(data[0]);
+
+      const neighbour = data[0].borders[0];
+
+      if (!neighbour) return;
+      //Nighbour country
+      return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`);
+    })
+    .then(response => response.json())
+    .then(data => {
+      renderCountry(data[0], 'neighbour');
+    });
+};
+// getCountryData('oman');
 
 // Country Input and submit
 function countryNameFromInput() {
   const name = countryInput.value;
-  if(!name) return 
+  if (!name) return;
 
-    countriesContainer.innerHTML = '';
-
- 
-  getCountryAndNeighbour(name);
-};
+  countriesContainer.innerHTML = '';
+  getCountryData(name);
+  
+}
