@@ -94,34 +94,86 @@ const renderError = function (msg) {
 // render error
 
 // Get Country data
+
+// const getJson = (url, errorMsg) => {
+//   return fetch(url).then(response => {
+//     if (!response.ok)
+//       throw new Error(
+//         `${errorMsg}❗${response.status}`
+//       );
+//     return response.json();
+//   });
+// };
+
+// const getCountryData = country => {
+//   fetch(`https://restcountries.com/v3.1/name/${country}`)
+//     .then(response => {})
+//     .then(data => {
+//       renderCountry(data[0]);
+
+//       const neighbour = data[0].borders[0];
+//       // const neighbour = "Salim"
+//       if (!neighbour) return;
+//       //Nighbour country
+//       return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`).then(
+//         response => {
+//           if (!response.ok)
+//             throw new Error(
+//               `Neighbour of "${countryInput.value}" not found❗${response.status}`
+//             );
+//           return response.json();
+//         }
+//       );
+//     })
+//     .then(data => {
+//       renderCountry(data[0], 'neighbour');
+//     })
+//     .catch(err => {
+//       // console.error(`Something went wrong 😞: ${err.message}`);
+//       renderError(`Something went wrong 😞: "${err.message}" Try again!`);
+//     })
+//     .finally(() => {
+//       countriesContainer.style.opacity = 1;
+//     });
+// };
+// getCountryData('oman');
+
+const getJson = (url, errorMsg) => {
+  return fetch(url).then(response => {
+    if (!response.ok) throw new Error(`${errorMsg}❗${response.status}`);
+    return response.json();
+  });
+};
+
 const getCountryData = country => {
-  fetch(`https://restcountries.com/v3.1/name/${country}`)
-    .then(response => response.json())
+  getJson(
+    `https://restcountries.com/v3.1/name/${country}`,
+    `"${countryInput.value}" not found`
+  )
     .then(data => {
       renderCountry(data[0]);
 
-      const neighbour = data[0].borders[0];
-
-      if (!neighbour) return;
-      //Nighbour country
-      return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`);
+      const neighbour = data[0].borders?.[0];
+      // const neighbour = "jsjskd"
+      if (!neighbour)  throw new Error('No neighbour found❗');
+      //neighbour country
+     return getJson(
+        `https://restcountries.com/v3.1/alpha/${neighbour}`,
+        `"${neighbour}" not found as a neighbour of ${countryInput.value}`
+      );
     })
-    .then(response => response.json())
     .then(data => {
+      
       renderCountry(data[0], 'neighbour');
     })
     .catch(err => {
       // console.error(`Something went wrong 😞: ${err.message}`);
-      renderError(
-        `Something went wrong 😞: "${countryInput.value}" may not a valid country`
-      );
+      renderError(`Something went wrong 😞: "${err.message}" Try again!`);
     })
     .finally(() => {
       countriesContainer.style.opacity = 1;
     });
 };
-// getCountryData('oman');
-
 // Country Input and submit
 function countryNameFromInput() {
   const name = countryInput.value;
