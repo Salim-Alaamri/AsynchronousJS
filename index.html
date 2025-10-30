@@ -9,12 +9,11 @@
     <title>Asynchronous JavaScript</title>
   </head>
   <body>
-    <h1>Country Name: </h1>
-    <input type="text" placeholder="Exm: USA" id="input">
-    <button onclick="countryNameFromInput()">Submit</button>
+    
+    
+    <!-- <button onclick="countryNameFromInput()">Submit</button> -->
     <main class="container">
       <div class="countries">
-        
         <!-- <article class="country">
           <img class="country__img" src="" />
           <div class="country__data">
@@ -25,12 +24,13 @@
             <p class="country__row"><span>💰</span>CUR</p>
           </div>
         </article> -->
-       
       </div>
-      <!-- <button class="btn-country">Where am I?</button> -->
-      <div class="images"></div>
       
+      <input type="text" placeholder="Exm: USA" id="input" class="field-country"/>
+      <button class="btn-country" onclick="countryNameFromInput()">
+        Submit
+      </button>
+      <div class="images"></div>
     </main>
-    
   </body>
 </html>

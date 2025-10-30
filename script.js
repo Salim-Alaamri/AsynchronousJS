@@ -4,20 +4,6 @@ const btn = document.querySelector('.btn-country');
 const countriesContainer = document.querySelector('.countries');
 const countryInput = document.getElementById('input');
 
-// NEW COUNTRIES API URL (use instead of the URL shown in videos):
-// https://restcountries.com/v2/name/portugal
-
-// NEW REVERSE GEOCODING API URL (use instead of the URL shown in videos):
-// https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}
-
-///////////////////////////////////////
-
-// const getCountryAndNeighbour = function (country) {
-//   // AJAX Call 1
-//   const request = new XMLHttpRequest();
-//   request.open('GET', `https://restcountries.com/v3.1/name/${country}`);
-//   request.send();
-
 const renderCountry = function (data, className = '') {
   const html = `
   <article class="country ${className}">
@@ -39,8 +25,28 @@ const renderCountry = function (data, className = '') {
   `;
 
   countriesContainer.insertAdjacentHTML('beforeend', html);
-  countriesContainer.style.opacity = 1;
+  // countriesContainer.style.opacity = 1;
+  countriesContainer.classList.remove('error');
 };
+const renderError = function (msg) {
+  countriesContainer.insertAdjacentText('beforeend', msg);
+  // countriesContainer.style.opacity = 1;
+  countriesContainer.classList.add('error');
+};
+
+// NEW COUNTRIES API URL (use instead of the URL shown in videos):
+// https://restcountries.com/v2/name/portugal
+
+// NEW REVERSE GEOCODING API URL (use instead of the URL shown in videos):
+// https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}
+
+///////////////////////////////////////
+
+// const getCountryAndNeighbour = function (country) {
+//   // AJAX Call 1
+//   const request = new XMLHttpRequest();
+//   request.open('GET', `https://restcountries.com/v3.1/name/${country}`);
+//   request.send();
 
 //   request.addEventListener('load', function () {
 //     // console.log(this.responseText);
@@ -85,6 +91,8 @@ const renderCountry = function (data, className = '') {
 
 // const request = fetch(`https://restcountries.com/v3.1/name/oman`);
 
+// render error
+
 // Get Country data
 const getCountryData = country => {
   fetch(`https://restcountries.com/v3.1/name/${country}`)
@@ -101,6 +109,15 @@ const getCountryData = country => {
     .then(response => response.json())
     .then(data => {
       renderCountry(data[0], 'neighbour');
+    })
+    .catch(err => {
+      // console.error(`Something went wrong 😞: ${err.message}`);
+      renderError(
+        `Something went wrong 😞: "${countryInput.value}" may not a valid country`
+      );
+    })
+    .finally(() => {
+      countriesContainer.style.opacity = 1;
     });
 };
 // getCountryData('oman');
@@ -112,5 +129,5 @@ function countryNameFromInput() {
 
   countriesContainer.innerHTML = '';
   getCountryData(name);
-  
+  // countryInput.value = '';
 }

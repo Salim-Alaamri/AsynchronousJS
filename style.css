@@ -21,9 +21,10 @@ body {
 }
 
 .container {
-  display: flex;
-  flex-flow: column;
+  display: grid;
+  flex-flow: row;
   align-items: center;
+  
 }
 
 .countries {
@@ -32,7 +33,8 @@ body {
 
   font-size: 2rem;
   opacity: 0;
-  transition: opacity 1s;
+  /* transition: opacity 5s; */
+  transition: all 1s ease;
 }
 
 .country {
@@ -98,13 +100,24 @@ body {
   font-size: 2.4rem;
 }
 
-.btn-country {
+.field-country {
   border: none;
+  margin: 20px 20px 10px 20px;
   font-size: 2rem;
   padding: 2rem 5rem;
   border-radius: 0.7rem;
   color: white;
-  background-color: orangered;
+  background-color: rgb(163, 158, 157);
+  cursor: pointer;
+}
+
+.btn-country {
+  border: none;
+  font-size: 2rem;
+  padding: 1rem 10rem;
+  border-radius: 0.7rem;
+  color: white;
+  background-color: rgb(24, 143, 57);
   cursor: pointer;
 }
 
@@ -123,4 +136,12 @@ body {
   margin: 2rem;
   border: 3rem solid white;
   box-shadow: 0 2rem 5rem 1rem rgba(0, 0, 0, 0.1);
+}
+.error {
+  border: 2px solid red;
+  background-color: #ffe6e6;
+  color: red;
+  padding: 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
