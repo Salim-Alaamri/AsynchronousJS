@@ -155,15 +155,14 @@ const getCountryData = country => {
 
       const neighbour = data[0].borders?.[0];
       // const neighbour = "jsjskd"
-      if (!neighbour)  throw new Error('No neighbour found❗');
+      if (!neighbour) throw new Error('No neighbour found❗');
       //neighbour country
-     return getJson(
+      return getJson(
         `https://restcountries.com/v3.1/alpha/${neighbour}`,
         `"${neighbour}" not found as a neighbour of ${countryInput.value}`
       );
     })
     .then(data => {
-      
       renderCountry(data[0], 'neighbour');
     })
     .catch(err => {
@@ -183,3 +182,26 @@ function countryNameFromInput() {
   getCountryData(name);
   // countryInput.value = '';
 }
+
+
+//practice fetch to  get geolocation
+const whereAmI = (lat, lng) => {
+  fetch(
+    `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}`
+  )
+    .then(res => {
+      if (!res.ok) throw new Error(`Problem with geocodeing ${res.status}`);
+      return res.json();
+    })
+    .then(data => {
+      console.log(data);
+      console.log(`You are in ${data.city}, ${data.countryName}`);
+    }).catch(err=> console.log(`${err.message}💥`))
+};
+
+// whereAmI(52.508, 13.381);
+// whereAmI(19.037, 72.873);
+// whereAmI(-33.933, 18.474);
+
+
+
