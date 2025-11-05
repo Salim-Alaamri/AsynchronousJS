@@ -1,5 +1,7 @@
 'use strict';
 
+// const { promise } = require('ping');
+
 const btn = document.querySelector('.btn-country');
 const countriesContainer = document.querySelector('.countries');
 const countryInput = document.getElementById('input');
@@ -183,7 +185,6 @@ function countryNameFromInput() {
   // countryInput.value = '';
 }
 
-
 //practice fetch to  get geolocation
 const whereAmI = (lat, lng) => {
   fetch(
@@ -196,12 +197,54 @@ const whereAmI = (lat, lng) => {
     .then(data => {
       console.log(data);
       console.log(`You are in ${data.city}, ${data.countryName}`);
-    }).catch(err=> console.log(`${err.message}💥`))
+    })
+    .catch(err => console.log(`${err.message}💥`));
 };
 
 // whereAmI(52.508, 13.381);
 // whereAmI(19.037, 72.873);
 // whereAmI(-33.933, 18.474);
 
+// Practice Event Loop
 
+// console.log('Test Start');
+// setTimeout(() => console.log('0 sec timer'), 0);
+// Promise.resolve('Resolved promise1').then(res => console.log(res));
+// console.log('Test end');
 
+const lotteryPromise = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    const randomNumber = Math.random();
+    console.log(randomNumber);
+    if (randomNumber >= 0.5) {
+      resolve('You WIN 💰');
+    } else {
+      reject(new Error('You lost your money 🤣'));
+    }
+  }, 2000);
+});
+
+lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
+
+//Promisifying setTimeout
+
+const wait = seconds => {
+  return new Promise(resolve => {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+wait(1).then(() => {
+  console.log('1 second passed');
+  return wait(1);
+});
+wait(1).then(() => {
+  console.log('2 second passed');
+  return wait(1);
+});
+wait(1)
+  .then(() => {
+    console.log('3 second passed');
+    return wait(1);
+  })
+  .then(() => console.log('4 second passed'));
