@@ -1,147 +1,276 @@
+/* ========== RESET & BASE STYLES ========== */
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: inherit;
-}
-
-html {
-  font-size: 62.5%;
-  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 body {
-  font-family: system-ui;
-  color: #555;
-  background-color: #f7f7f7;
-  min-height: 100vh;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-color: #0f172a; /* خلفية داكنة */
+  color: #e2e8f0;
+  padding: 2rem;
 }
 
+/* ========== MAIN CONTAINER AS DASHBOARD GRID ========== */
 .container {
+  max-width: 1100px;
+  margin: 0 auto;
+  background-color: #1e293b;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+
   display: grid;
-  flex-flow: row;
-  align-items: center;
-  
+  grid-template-columns: 2fr 1.4fr;       /* عمود عريض للدول + عمود للجامعات */
+  grid-template-rows: auto minmax(0, 1fr); /* صف أول للـ input/btn و الثاني للمحتوى */
+  gap: 1.5rem;
+  align-items: flex-start;
+
+  position: relative; /* عشان الـ loader يتمركز فوقه */
 }
 
-.countries {
-  /* margin-bottom: 8rem; */
-  display: flex;
-
-  font-size: 2rem;
-  opacity: 0;
-  /* transition: opacity 5s; */
-  transition: all 1s ease;
-}
-
-.country {
-  background-color: #fff;
-  box-shadow: 0 2rem 5rem 1rem rgba(0, 0, 0, 0.1);
-  font-size: 1.8rem;
-  width: 30rem;
-  border-radius: 0.7rem;
-  margin: 0 3rem;
-  /* overflow: hidden; */
-}
-
-.neighbour::before {
-  content: 'Neighbour country';
-  width: 100%;
-  position: absolute;
-  top: -4rem;
-
-  text-align: center;
-  font-size: 1.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: #888;
-}
-
-.neighbour {
-  transform: scale(0.8) translateY(1rem);
-  margin-left: 0;
-}
-
-.country__img {
-  width: 30rem;
-  height: 17rem;
-  object-fit: cover;
-  background-color: #eee;
-  border-top-left-radius: 0.7rem;
-  border-top-right-radius: 0.7rem;
-}
-
-.country__data {
-  padding: 2.5rem 3.75rem 3rem 3.75rem;
-}
-
-.country__name {
-  font-size: 2.7rem;
-  margin-bottom: 0.7rem;
-}
-
-.country__region {
-  font-size: 1.4rem;
-  margin-bottom: 2.5rem;
-  text-transform: uppercase;
-  color: #888;
-}
-
-.country__row:not(:last-child) {
-  margin-bottom: 1rem;
-}
-
-.country__row span {
-  display: inline-block;
-  margin-right: 2rem;
-  font-size: 2.4rem;
-}
-
+/* ========== INPUT & BUTTON (صف التحكم) ========== */
 .field-country {
-  border: none;
-  margin: 20px 20px 10px 20px;
-  font-size: 2rem;
-  padding: 2rem 5rem;
-  border-radius: 0.7rem;
-  color: white;
-  background-color: rgb(163, 158, 157);
-  cursor: pointer;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  background-color: #1e293b;
+  color: #f8fafc;
+
+  grid-column: 1 / 2;   /* العمود الأيسر في الصف الأول */
+  grid-row: 1 / 2;
+}
+
+.field-country:focus {
+  outline: none;
+  border-color: #38bdf8;
+  background-color: #0f172a;
 }
 
 .btn-country {
+  padding: 0.6rem 1.2rem;
+  background-color: #22c55e;
+  color: #022c22;
   border: none;
-  font-size: 2rem;
-  padding: 1rem 10rem;
-  border-radius: 0.7rem;
-  color: white;
-  background-color: rgb(24, 143, 57);
+  border-radius: 6px;
   cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+
+  grid-column: 2 / 3;   /* العمود الأيمن في الصف الأول */
+  grid-row: 1 / 2;
+  justify-self: flex-start;
+  align-self: center;
 }
 
-.images {
-  display: flex;
+.btn-country:hover {
+  background-color: #16a34a;
 }
 
-.images img {
-  display: block;
-  width: 80rem;
-  margin: 4rem;
+/* ========== COUNTRIES TABLE (العمود الأيسر) ========== */
+.countries {
+  grid-column: 1 / 2;   /* عمود الدول */
+  grid-row: 2 / 3;
+  overflow-x: auto;
 }
 
-.images img.parallel {
-  width: 40rem;
-  margin: 2rem;
-  border: 3rem solid white;
-  box-shadow: 0 2rem 5rem 1rem rgba(0, 0, 0, 0.1);
-}
-.error {
-  border: 2px solid red;
-  background-color: #ffe6e6;
-  color: red;
-  padding: 1rem;
+.countries-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+  background-color: #0f172a;
   border-radius: 8px;
-  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.countries-table th,
+.countries-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #334155;
+  font-size: 0.9rem;
+}
+
+.countries-table th {
+  background-color: #1e293b;
+  color: #f8fafc;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.country__img {
+  width: 50px;
+  height: auto;
+  border-radius: 4px;
+  border: 1px solid #334155;
+}
+
+/* ألوان ديناميكية للصفوف */
+.country.has-neighbour {
+  background-color: rgba(34, 197, 94, 0.08);  /* أخضر خفيف */
+}
+
+.country.no-neighbour {
+  background-color: rgba(239, 68, 68, 0.08);  /* أحمر خفيف */
+}
+
+.country.neighbour {
+  background-color: rgba(56, 189, 248, 0.08); /* أزرق خفيف للجار */
+}
+
+/* ========== UNIVERSITIES PANEL (العمود الأيمن) ========== */
+.images {
+  grid-column: 2 / 3;   /* عمود الجامعات */
+  grid-row: 2 / 3;
+
+  background-color: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+
+  /* لون افتراضي للـ accent، يتغير من JS */
+  --uni-accent: #38bdf8;
+}
+
+.university {
+  border-bottom: 1px solid #334155;
+  padding: 0.6rem 0;
+}
+
+.university h3 {
+  margin-bottom: 0.3rem;
+  color: var(--uni-accent); /* نستخدم اللون الديناميكي */
+  font-size: 1rem;
+}
+
+.university p {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+}
+
+.university a {
+  color: #38bdf8;
+  text-decoration: none;
+}
+
+.university a:hover {
+  text-decoration: underline;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  text-align: center;
+  padding: 1.2rem 0.8rem;
+  border-radius: 8px;
+  background-color: #020617;
+  border: 1px dashed #334155;
+  color: #cbd5e1;
+  margin-top: 0.5rem;
+}
+
+.empty-state p:first-child {
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+/* ===== TOTAL UNIVERSITIES SUMMARY (ثابت تحت العمود الأيمن) ===== */
+.uni-summary {
+  grid-column: 2 / 3;    /* نفس عمود الجامعات */
+  text-align: center;
+  padding: 0.8rem 0;
+  font-size: 1rem;
+  color: #e2e8f0;
+  font-weight: 600;
+  background-color: #1e293b;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.uni-summary .uni-total strong {
+  color: var(--uni-accent, #38bdf8);
+  font-weight: 700;
+}
+
+/* ========== ERROR MESSAGE ========== */
+.error {
+  color: #f87171;
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+}
+
+/* ========== LOADER OVERLAY ========== */
+.loader {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 4px solid #334155;
+  border-top-color: #38bdf8;
+  animation: spin 0.8s linear infinite;
+}
+
+.hidden {
+  display: none;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========== SCROLLBAR STYLING (اختياري) ========== */
+.images::-webkit-scrollbar,
+.countries::-webkit-scrollbar {
+  width: 8px;
+}
+
+.images::-webkit-scrollbar-thumb,
+.countries::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+.images::-webkit-scrollbar-thumb:hover,
+.countries::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* ========== RESPONSIVE (شاشات صغيرة) ========== */
+@media (max-width: 768px) {
+  .container {
+    display: block;
+  }
+
+  .field-country,
+  .btn-country {
+    display: inline-block;
+    margin-top: 0.5rem;
+  }
+
+  .btn-country {
+    margin-left: 0.5rem;
+  }
+
+  .images {
+    margin-top: 1.5rem;
+  }
+
+  .uni-summary {
+    margin-top: 0.8rem;
+  }
 }

@@ -1,250 +1,225 @@
 'use strict';
 
-// const { promise } = require('ping');
-
+// ===== DOM ELEMENTS =====
 const btn = document.querySelector('.btn-country');
-const countriesContainer = document.querySelector('.countries');
 const countryInput = document.getElementById('input');
+const appContainer = document.querySelector('.container');
+const countriesContainer = document.querySelector('.countries');
+const countriesBody = document.querySelector('.countries-body');
+const universitiesWrapper = document.querySelector('.images');
 
+// ===== ERROR ELEMENT (تحت الجدول) =====
+const errorContainer = document.createElement('p');
+errorContainer.classList.add('error');
+countriesContainer.append(errorContainer);
+
+// ===== SUMMARY ELEMENT (خارج قائمة الجامعات بمكان ثابت) =====
+const uniSummary = document.createElement('div');
+uniSummary.classList.add('uni-summary');
+universitiesWrapper.after(uniSummary);
+
+// ===== LOADER OVERLAY =====
+const loader = document.createElement('div');
+loader.classList.add('loader', 'hidden');
+loader.innerHTML = `<div class="spinner"></div>`;
+appContainer.append(loader);
+
+const showLoader = () => loader.classList.remove('hidden');
+const hideLoader = () => loader.classList.add('hidden');
+
+// نخزّن آخر Region عشان نلوّن الجامعات بناءً عليه
+let lastRegion = null;
+
+// ===== UI: RENDER COUNTRY ROW IN TABLE =====
 const renderCountry = function (data, className = '') {
+  const countryName = data.altSpellings?.[1] || data.name?.common || 'Unknown';
+
   const html = `
-  <article class="country ${className}">
-          <img class="country__img" src="${data.flags.png}" />
-          <div class="country__data">
-            <h3 class="country__name">${data.altSpellings[1]}</h3>
-            <h4 class="country__region">${data.region}</h4>
-            <p class="country__row"><span>👫</span>${(
-              +data.population / 1000000
-            ).toFixed(1)} <span> m</span></p>
-            <p class="country__row"><span>🗣️</span>${JSON.stringify(
-              Object.values(data.languages)[0]
-            )}</p>
-            <p class="country__row"><span>💰</span>${JSON.stringify(
-              Object.values(data.currencies)[0].symbol
-            )}</p>
-          </div>
-        </article>
+    <tr class="country ${className}">
+      <td>
+        <img class="country__img" src="${data.flags.png}" alt="${countryName} flag" />
+      </td>
+      <td>${countryName}</td>
+      <td>${data.region}</td>
+      <td>${(+data.population / 1000000).toFixed(1)} m</td>
+      <td>${Object.values(data.languages || {})[0] || '-'}</td>
+      <td>${Object.values(data.currencies || {})[0]?.symbol || '-'}</td>
+    </tr>
   `;
 
-  countriesContainer.insertAdjacentHTML('beforeend', html);
-  // countriesContainer.style.opacity = 1;
+  countriesBody.insertAdjacentHTML('beforeend', html);
   countriesContainer.classList.remove('error');
+  errorContainer.textContent = '';
 };
+
+// ===== UI: RENDER ERROR =====
 const renderError = function (msg) {
-  countriesContainer.insertAdjacentText('beforeend', msg);
-  // countriesContainer.style.opacity = 1;
+  errorContainer.textContent = msg;
   countriesContainer.classList.add('error');
 };
 
-// NEW COUNTRIES API URL (use instead of the URL shown in videos):
-// https://restcountries.com/v2/name/portugal
-
-// NEW REVERSE GEOCODING API URL (use instead of the URL shown in videos):
-// https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}
-
-///////////////////////////////////////
-
-// const getCountryAndNeighbour = function (country) {
-//   // AJAX Call 1
-//   const request = new XMLHttpRequest();
-//   request.open('GET', `https://restcountries.com/v3.1/name/${country}`);
-//   request.send();
-
-//   request.addEventListener('load', function () {
-//     // console.log(this.responseText);
-
-//     const [data] = JSON.parse(this.responseText);
-//     console.log(data);
-
-//     //render country 1
-//     renderCountry(data);
-
-//     //Get Neighbour Country (2)
-// const [neighbour] = data.borders;
-//     // console.log(neighbour);
-
-// if (!neighbour) return;
-
-//     //AJAX Call 2
-//     const request2 = new XMLHttpRequest();
-//     request2.open('GET', `https://restcountries.com/v3.1/alpha/${neighbour}`);
-//     request2.send();
-
-//     request2.addEventListener('load', function () {
-//       const [data2] = JSON.parse(this.responseText);
-//       renderCountry(data2, 'neighbour');
-//       console.log(data2);
-//     });
-
-//   });
-// };
-
-// Country Input and submit
-// function countryNameFromInput() {
-//   const name = countryInput.value;
-//   if(!name) return
-
-//     countriesContainer.innerHTML = '';
-
-//   getCountryAndNeighbour(name);
-// };
-
-//Fetch API
-
-// const request = fetch(`https://restcountries.com/v3.1/name/oman`);
-
-// render error
-
-// Get Country data
-
-// const getJson = (url, errorMsg) => {
-//   return fetch(url).then(response => {
-//     if (!response.ok)
-//       throw new Error(
-//         `${errorMsg}❗${response.status}`
-//       );
-//     return response.json();
-//   });
-// };
-
-// const getCountryData = country => {
-//   fetch(`https://restcountries.com/v3.1/name/${country}`)
-//     .then(response => {})
-//     .then(data => {
-//       renderCountry(data[0]);
-
-//       const neighbour = data[0].borders[0];
-//       // const neighbour = "Salim"
-//       if (!neighbour) return;
-//       //Nighbour country
-//       return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`).then(
-//         response => {
-//           if (!response.ok)
-//             throw new Error(
-//               `Neighbour of "${countryInput.value}" not found❗${response.status}`
-//             );
-//           return response.json();
-//         }
-//       );
-//     })
-//     .then(data => {
-//       renderCountry(data[0], 'neighbour');
-//     })
-//     .catch(err => {
-//       // console.error(`Something went wrong 😞: ${err.message}`);
-//       renderError(`Something went wrong 😞: "${err.message}" Try again!`);
-//     })
-//     .finally(() => {
-//       countriesContainer.style.opacity = 1;
-//     });
-// };
-// getCountryData('oman');
-
+// ===== HELPER: FETCH JSON WITH ERROR HANDLING =====
 const getJson = (url, errorMsg) => {
   return fetch(url).then(response => {
-    if (!response.ok) throw new Error(`${errorMsg}❗${response.status}`);
+    if (!response.ok) throw new Error(`${errorMsg} ❗ ${response.status}`);
     return response.json();
   });
 };
 
+// ===== MAIN: FETCH COUNTRY + NEIGHBOUR =====
 const getCountryData = country => {
-  getJson(
+  return getJson(
     `https://restcountries.com/v3.1/name/${country}`,
-    `"${countryInput.value}" not found`
+    `"${country}" not found`
   )
     .then(data => {
-      renderCountry(data[0]);
+      const mainCountry = data[0];
 
-      const neighbour = data[0].borders?.[0];
-      // const neighbour = "jsjskd"
-      if (!neighbour) throw new Error('No neighbour found❗');
-      //neighbour country
+      // نحفظ Region لاستخدامه مع الجامعات
+      lastRegion = mainCountry.region;
+
+      // نعرف إذا فيه جار أو لا
+      const neighbour = mainCountry.borders?.[0];
+
+      // كلاس مختلف حسب وجود جار
+      renderCountry(
+        mainCountry,
+        neighbour ? 'has-neighbour' : 'no-neighbour'
+      );
+
+      // نجيب الجامعات (مرة واحدة)
+      listOfUni(country);
+
+      // لو ما فيه جار نوقف السلسلة بهدوء
+      if (!neighbour) return null;
+
+      // لو فيه جار نجيب بياناته
       return getJson(
         `https://restcountries.com/v3.1/alpha/${neighbour}`,
-        `"${neighbour}" not found as a neighbour of ${countryInput.value}`
+        `"${neighbour}" not found as a neighbour of ${country}`
       );
     })
     .then(data => {
+      // لو ما فيه جار data بتكون null
+      if (!data) return;
+
+      // نرندر الجار بكلاس neighbour
       renderCountry(data[0], 'neighbour');
     })
     .catch(err => {
-      // console.error(`Something went wrong 😞: ${err.message}`);
       renderError(`Something went wrong 😞: "${err.message}" Try again!`);
-    })
-    .finally(() => {
-      countriesContainer.style.opacity = 1;
     });
 };
-// Country Input and submit
+
+// ===== INPUT HANDLER =====
 function countryNameFromInput() {
-  const name = countryInput.value;
+  const name = countryInput.value.trim();
   if (!name) return;
 
-  countriesContainer.innerHTML = '';
-  getCountryData(name);
-  // countryInput.value = '';
+  // Clear previous data
+  countriesBody.innerHTML = '';
+  universitiesWrapper.innerHTML = '';
+  uniSummary.innerHTML = '';
+  errorContainer.textContent = '';
+  countriesContainer.classList.remove('error');
+
+  showLoader();
+
+  const p = getCountryData(name);
+  if (p && typeof p.finally === 'function') {
+    p.finally(() => hideLoader());
+  } else {
+    hideLoader();
+  }
 }
 
-//practice fetch to  get geolocation
+// عندك onclick="countryNameFromInput()" في الـ HTML للزر
+// هنا فقط نضيف دعم زر Enter
+countryInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') countryNameFromInput();
+});
+
+// ===== PRACTICE: GEOLOCATION (اختياري) =====
 const whereAmI = (lat, lng) => {
   fetch(
     `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}`
   )
     .then(res => {
-      if (!res.ok) throw new Error(`Problem with geocodeing ${res.status}`);
+      if (!res.ok) throw new Error(`Problem with geocoding ${res.status}`);
       return res.json();
     })
     .then(data => {
       console.log(data);
       console.log(`You are in ${data.city}, ${data.countryName}`);
     })
-    .catch(err => console.log(`${err.message}💥`));
+    .catch(err => console.log(`${err.message} 💥`));
 };
 
-// whereAmI(52.508, 13.381);
-// whereAmI(19.037, 72.873);
-// whereAmI(-33.933, 18.474);
+// ===== UNIVERSITIES (ASYNC / AWAIT + DYNAMIC COLORS + EMPTY STATE) =====
+async function listOfUni(country) {
+  try {
+    const res = await fetch(
+      `http://universities.hipolabs.com/search?country=${country}`
+    );
+    let data = await res.json();
 
-// Practice Event Loop
+    universitiesWrapper.innerHTML = ''; // clear previous
+    uniSummary.innerHTML = '';         // clear previous summary
 
-// console.log('Test Start');
-// setTimeout(() => console.log('0 sec timer'), 0);
-// Promise.resolve('Resolved promise1').then(res => console.log(res));
-// console.log('Test end');
+    console.log(`List of Universities in ${country}`);
 
-const lotteryPromise = new Promise((resolve, reject) => {
-  setTimeout(() => {
-    const randomNumber = Math.random();
-    console.log(randomNumber);
-    if (randomNumber >= 0.5) {
-      resolve('You WIN 💰');
-    } else {
-      reject(new Error('You lost your money 🤣'));
+    // خريطة ألوان حسب الـ Region
+    const regionColors = {
+      Asia: '#22c55e',
+      Europe: '#38bdf8',
+      Africa: '#eab308',
+      Americas: '#f97316',
+      Oceania: '#a855f7',
+    };
+
+    const accent = regionColors[lastRegion] || '#64748b';
+
+    // نطبق اللون على إطار صندوق الجامعات + CSS variable
+    universitiesWrapper.style.borderColor = accent;
+    universitiesWrapper.style.boxShadow = `0 0 0 1px ${accent}33`;
+    universitiesWrapper.style.setProperty('--uni-accent', accent);
+
+    let number = 1;
+
+    if (data.length === 0) {
+      universitiesWrapper.insertAdjacentHTML(
+        'beforeend',
+        `<div class="empty-state">
+           <p>🚫 No universities found for <strong>${country}</strong>.</p>
+           <p>Try another country name.</p>
+         </div>`
+      );
+      uniSummary.innerHTML = `<p class="uni-total">Total Universities in ${country}: <strong>0</strong></p>`;
+      return;
     }
-  }, 2000);
-});
 
-lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
+    data.forEach(uni => {
+      const listOfUNIrender = `
+        <div class="university">
+          <h3>${number}. ${uni.name}</h3>
+          <p><strong>Country:</strong> ${uni.country}</p>
+          <p><strong>Website:</strong> <a href="${uni.web_pages[0]}" target="_blank">${uni.web_pages[0]}</a></p>
+          <hr>
+        </div>
+      `;
+      universitiesWrapper.insertAdjacentHTML('beforeend', listOfUNIrender);
+      number++;
+    });
 
-//Promisifying setTimeout
-
-const wait = seconds => {
-  return new Promise(resolve => {
-    setTimeout(resolve, seconds * 1000);
-  });
-};
-
-wait(1).then(() => {
-  console.log('1 second passed');
-  return wait(1);
-});
-wait(1).then(() => {
-  console.log('2 second passed');
-  return wait(1);
-});
-wait(1)
-  .then(() => {
-    console.log('3 second passed');
-    return wait(1);
-  })
-  .then(() => console.log('4 second passed'));
+    uniSummary.innerHTML = `<p class="uni-total">Total Universities in ${country}: <strong>${number - 1}</strong></p>`;
+  } catch (err) {
+    console.error(err);
+    universitiesWrapper.innerHTML = `
+      <div class="empty-state">
+        <p>⚠️ Error loading universities.</p>
+        <p>${err.message}</p>
+      </div>
+    `;
+    uniSummary.innerHTML = `<p class="uni-total">Total Universities in ${country}: <strong>0</strong></p>`;
+  }
+}

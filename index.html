@@ -14,17 +14,23 @@
     <!-- <button onclick="countryNameFromInput()">Submit</button> -->
     <main class="container">
       <div class="countries">
-        <!-- <article class="country">
-          <img class="country__img" src="" />
-          <div class="country__data">
-            <h3 class="country__name">COUNTRY</h3>
-            <h4 class="country__region">REGION</h4>
-            <p class="country__row"><span>👫</span>POP people</p>
-            <p class="country__row"><span>🗣️</span>LANG</p>
-            <p class="country__row"><span>💰</span>CUR</p>
-          </div>
-        </article> -->
-      </div>
+  <table class="countries-table">
+    <thead>
+      <tr>
+        <th>Flag</th>
+        <th>Country</th>
+        <th>Region</th>
+        <th>Population (M)</th>
+        <th>Language</th>
+        <th>Currency</th>
+      </tr>
+    </thead>
+    <tbody class="countries-body">
+      <!-- Rows will be added here by JS -->
+    </tbody>
+  </table>
+</div>
+
       
       <input type="text" placeholder="Exm: Oman" id="input" class="field-country"/>
       <button class="btn-country" onclick="countryNameFromInput()">
